@@ -3,94 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>웹툰 상세 정보</title>
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="/static/style.css">
-    <script src="/static/Chart.js"></script>
-
 </head>
 <body>
-    <h1>{{ webtoon['title'] }}</h1>
+    <h1>{{ webtoon['title'] }} 상세 정보</h1>
 
-    <canvas id="ratingChart"></canvas>
+    {% if no_data %}
+        <p>🚨 해당 웹툰의 예측 데이터가 없습니다.</p>
+    {% else %}
+        <!-- ✅ 별점 예측 그래프 -->
+        <h2>⭐ 별점 예측 비교</h2>
+        <canvas id="ratingChart"></canvas>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-    let ctx = document.getElementById("ratingChart").getContext("2d");
+        <!-- ✅ 감성 트렌드 그래프 -->
+        <h2>📊 감성 트렌드</h2>
+        <canvas id="sentimentChart"></canvas>
 
-    let episodeNumbers = JSON.parse('{{ episode_numbers | safe }}');
-    let actualRatings = JSON.parse('{{ actual_ratings | safe }}');
-    let model1Predictions = JSON.parse('{{ model_1_predictions | safe }}');
-    let model2Predictions = JSON.parse('{{ model_2_predictions | safe }}');
-    let model3Predictions = JSON.parse('{{ model_3_predictions | safe }}');
+        <!-- ✅ 오차 분석 그래프 -->
+        <h2>📉 오차 분석 (에피소드별 오차)</h2>
+        <canvas id="residualChart"></canvas>
 
-    let ratingChart = new Chart(ctx, {
-        type: "line",
-        data: {
-            labels: episodeNumbers,
-            datasets: [
-                {
-                    label: "실제 별점",
-                    borderColor: "#ff4757",  // 네온 레드
-                    backgroundColor: "rgba(255, 71, 87, 0.2)",
-                    data: actualRatings,
-                    fill: false,
-                    borderWidth: 2,
-                    pointRadius: 4,   // 🔹 데이터 포인트 크기 (점)
-                    pointBackgroundColor: "#ff4757"
-                },
-                {
-                    label: "모델 1 예측 별점",
-                    borderColor: "#1e90ff",  // 네온 블루
-                    backgroundColor: "rgba(30, 144, 255, 0.2)",
-                    data: model1Predictions,
-                    fill: false,
-                    borderWidth: 2,
-                    pointRadius: 4,
-                    pointBackgroundColor: "#1e90ff"
-                },
-                {
-                    label: "모델 2 예측 별점",
-                    borderColor: "#2ed573",  // 네온 그린
-                    backgroundColor: "rgba(46, 213, 115, 0.2)",
-                    data: model2Predictions,
-                    fill: false,
-                    borderWidth: 2,
-                    pointRadius: 4,
-                    pointBackgroundColor: "#2ed573"
-                },
-                {
-                    label: "모델 3 예측 별점",
-                    borderColor: "#ffa502",  // 네온 오렌지
-                    backgroundColor: "rgba(255, 165, 2, 0.2)",
-                    data: model3Predictions,
-                    fill: false,
-                    borderWidth: 2,
-                    pointRadius: 4,
-                    pointBackgroundColor: "#ffa502"
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    min: 3.0,  // ⭐ 최소 5.0
-                    max: 10.0, // ⭐ 최대 10.0
-                    ticks: {
-                        stepSize: 0.5,  // ⭐ 0.5 단위 눈금
-                        color: "#333"
+        <!-- ✅ 오차 히스토그램 그래프 -->
+        <h2>📊 오차 히스토그램 (전체 데이터)</h2>
+        <canvas id="residualHistogram"></canvas>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                let episodeNumbers = JSON.parse('{{ episode_numbers | safe }}');
+
+                let actualRatings = JSON.parse('{{ actual_ratings | safe }}');
+                let model1Predictions = JSON.parse('{{ model_1_predictions | safe }}');
+                let model2Predictions = JSON.parse('{{ model_2_predictions | safe }}');
+                let model3Predictions = JSON.parse('{{ model_3_predictions | safe }}');
+
+                let positiveRatio = JSON.parse('{{ positive_ratio | safe }}');
+                let negativeRatio = JSON.parse('{{ negative_ratio | safe }}');
+
+                let residuals = JSON.parse('{{ residuals | safe }}');
+                let histogramBins = JSON.parse('{{ histogram_bins | safe }}');
+                let histogramValues = JSON.parse('{{ histogram_values | safe }}');
+
+                // ✅ 별점 예측 그래프
+                new Chart(document.getElementById("ratingChart"), {
+                    type: "line",
+                    data: {
+                        labels: episodeNumbers,
+                        datasets: [
+                            { label: "실제 별점", borderColor: "#ff4757", data: actualRatings, fill: false },
+                            { label: "선형 회귀 예측", borderColor: "#1e90ff", data: model1Predictions, fill: false },
+                            { label: "랜덤 포레스트 예측", borderColor: "#2ed573", data: model2Predictions, fill: false },
+                            { label: "LSTM 예측", borderColor: "#ffa502", data: model3Predictions, fill: false }
+                        ]
                     },
-                    grid: { color: "#bbb" }  // 눈금 색 변경
-                },
-                x: {
-                    grid: { color: "#ddd" }
-                }
-            }
-        }
-    });
-});
-    </script>
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: { title: { display: true, text: "별점" } },
+                            x: { title: { display: true, text: "에피소드" } }
+                        }
+                    }
+                });
+
+                // ✅ 감성 트렌드 그래프
+                new Chart(document.getElementById("sentimentChart"), {
+                    type: "line",
+                    data: {
+                        labels: episodeNumbers,
+                        datasets: [
+                            { label: "긍정비율", borderColor: "#008000", data: positiveRatio, fill: false },
+                            { label: "부정비율", borderColor: "#ff0000", data: negativeRatio, fill: false }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: { title: { display: true, text: "비율" } },
+                            x: { title: { display: true, text: "에피소드" } }
+                        }
+                    }
+                });
+
+                // ✅ 오차 분석 그래프 (에피소드별 오차)
+                new Chart(document.getElementById("residualChart"), {
+                    type: "bar",
+                    data: {
+                        labels: episodeNumbers,
+                        datasets: [{
+                            label: "예측 오차 (실제 - 선형회귀)",
+                            backgroundColor: "#ffcc00",
+                            data: residuals
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: { title: { display: true, text: "오차" } },
+                            x: { title: { display: true, text: "에피소드" } }
+                        }
+                    }
+                });
+
+                // ✅ 오차 히스토그램 그래프 (전체 데이터)
+                new Chart(document.getElementById("residualHistogram"), {
+                    type: "bar",
+                    data: {
+                        labels: histogramBins.map(bin => bin.toFixed(2)),
+                        datasets: [{
+                            label: "예측 오차 분포",
+                            backgroundColor: "rgba(255, 99, 132, 0.6)",
+                            borderColor: "rgba(255, 99, 132, 1)",
+                            borderWidth: 1,
+                            data: histogramValues
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: { title: { display: true, text: "오차 (실제별점 - 예측별점)" } },
+                            y: { title: { display: true, text: "빈도" } }
+                        }
+                    }
+                });
+
+            });
+        </script>
+    {% endif %}
+
+    <!-- 🔙 메인 페이지로 돌아가기 버튼 -->
     <a href="/" class="back-button">🔙 메인 페이지로 돌아가기</a>
 </body>
 </html>

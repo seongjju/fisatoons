@@ -3,8 +3,12 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, HTMLResponse
 from pymongo import MongoClient
-import json
+from app.model_MLDL import get_webtoon_prediction, get_sentiment_trend, get_residual_analysis  # 추가된 함수 불러오기
+
+from app.plot_overall_predictions import generate_overall_predictions_graph  # 📌 그래프 함수 불러오기
 from app.rating_scraper import generate_genre_rating_graph  # 📌 'app.rating_scraper'로 변경
+import os
+import pandas as pd
 
 app = FastAPI()
 
@@ -18,6 +22,11 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 client = MongoClient("mongodb://localhost:27017/")
 db = client["webtoon_db"]
 webtoon_col = db["webtoons"]
+
+# CSV 데이터 로드
+script_dir = os.path.dirname(os.path.abspath(__file__))
+csv_path = os.path.join(script_dir, "..", "data", "prediction_all.csv")
+df = pd.read_csv(csv_path)
 
 @app.get("/favicon.ico")
 async def favicon():
@@ -44,35 +53,41 @@ async def home(request: Request):
         "request": request, "webtoon_by_weekday": webtoon_by_weekday, "weekday_labels": weekday_labels
     })
 
-# ✅ 📌 웹툰 상세 페이지 - 별점 그래프 표시
+
 @app.get("/webtoon/{webtoon_id}")
-async def webtoon_detail(request: Request, webtoon_id: str):
-    webtoon = webtoon_col.find_one({"_id": webtoon_id})
+async def webtoon_detail(request: Request, webtoon_id: int):
+    # 📌 MongoDB에서 해당 웹툰의 제목 가져오기
+    webtoon_db_entry = webtoon_col.find_one({"_id": str(webtoon_id)}, {"title": 1})
+    if not webtoon_db_entry:
+        return templates.TemplateResponse("webtoon_detail.html", {
+            "request": request,
+            "no_data": True,
+            "webtoon": {"title": f"웹툰 {webtoon_id}"},  # 기본값 (MongoDB에 없을 경우)
+        })
 
-    if not webtoon or "episodes" not in webtoon:
-        return templates.TemplateResponse("webtoon_detail.html", {"request": request, "webtoon": None})
-
-    # 🔹 JSON 데이터 변환 (화번호 기준 정렬)
-    episodes = sorted(webtoon["episodes"], key=lambda x: int(x["episode"]))
-
-    # 🔹 데이터 정리 (각 모델의 예측 값도 포함)
-    episode_numbers = [ep["episode"] for ep in episodes]
-    actual_ratings = [ep["rating"] for ep in episodes]
-    model_1_predictions = [ep.get("model_1", None) for ep in episodes]
-    model_2_predictions = [ep.get("model_2", None) for ep in episodes]
-    model_3_predictions = [ep.get("model_3", None) for ep in episodes]
+    # 📌 웹툰 데이터 가져오기
+    webtoon_data = get_webtoon_prediction(webtoon_id)
+    sentiment_data = get_sentiment_trend(webtoon_id)
+    residual_data = get_residual_analysis(webtoon_id)
 
     return templates.TemplateResponse("webtoon_detail.html", {
         "request": request,
-        "webtoon": webtoon,
-        "episode_numbers": json.dumps(episode_numbers),
-        "actual_ratings": json.dumps(actual_ratings),
-        "model_1_predictions": json.dumps(model_1_predictions),
-        "model_2_predictions": json.dumps(model_2_predictions),
-        "model_3_predictions": json.dumps(model_3_predictions),
+        "webtoon": {"title": webtoon_db_entry["title"]},  # 📌 MongoDB에서 가져온 제목 사용
+        **webtoon_data,
+        "positive_ratio": sentiment_data["positive_ratio"],
+        "negative_ratio": sentiment_data["negative_ratio"],
+        "residuals": residual_data["residuals"],
+        "histogram_bins": residual_data["histogram_bins"],
+        "histogram_values": residual_data["histogram_values"]
     })
-
 # ✅ 📌 장르별 평균 별점 그래프 라우트 (rating_scraper에서 불러오기)
 @app.get("/genre-rating-graph")
 async def genre_rating_graph():
     return generate_genre_rating_graph()
+
+
+
+# ✅ 📌 전체 웹툰 예측 비교 그래프 API
+@app.get("/overall-predictions-graph", response_class=HTMLResponse)
+async def overall_predictions_graph():
+    return generate_overall_predictions_graph()

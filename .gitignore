@@ -18,4 +18,5 @@ logs/
 # ✅ Git 덮어쓰기 방지
 !.gitignore
 
+# .csv 파일
 data
