@@ -56,12 +56,13 @@
     </script>
 
     <!-- ✅ 전체 웹툰 예측 비교 그래프 보기 버튼 -->
-<button id="load-overall-graph" class="graph-button">📊 전체 웹툰 예측 비교 그래프 보기</button>
+<button id="load-overall-graph" class="back-button">📊 전체 웹툰 예측 비교 그래프 보기</button>
 
 <!-- ✅ 그래프 표시 영역 -->
 <div id="overall-graph-container" style="margin-top: 20px;">
     <iframe id="overall-graph-frame" src="" style="width: 100%; height: 700px; border: none; display: none;"></iframe>
 </div>
+
 
 <script>
     $(document).ready(function() {
@@ -70,5 +71,21 @@
         });
     });
 </script>
+
+    <!-- ✅ 웹툰별 평균 별점 꺾은선 그래프 보기 버튼 -->
+    <button id="load-webtoon-avg-line-graph" class="back-button">📊 웹툰별 평균 별점 그래프 보기</button>
+
+    <!-- ✅ 그래프 표시 영역 -->
+    <div id="webtoon-avg-line-graph-container" style="margin-top: 20px;">
+        <iframe id="webtoon-avg-line-graph-frame" src="" style="width: 100%; height: 700px; border: none; display: none;"></iframe>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $("#load-webtoon-avg-line-graph").click(function() {
+                $("#webtoon-avg-line-graph-frame").attr("src", "/webtoon-avg-line-graph").show();
+            });
+        });
+    </script>
 </body>
 </html>
