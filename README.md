@@ -21,14 +21,21 @@ FISAToon 프로젝트는 **웹툰 댓글 데이터를 기반으로 감성 분석
 ---
 
 ## 🛠 개발 환경  
+### 🔹 **프레임워크 & 웹 서버**
+- FastAPI 
+- html, css , javascript
+
+### 🔹 **데이터베이스 & 스토리지**
+- MongoDB (댓글 = 비정형 데이터)
+
 - **Google Colab** (GPU 활용)  
 - **Google Drive** (모델 및 데이터 저장)  
 - **Python 주요 라이브러리:**  
-  - `Selenium` (웹 크롤링)  
-  - `pandas`, `numpy` (데이터 처리)  
-  - `Hugging Face Transformers` (감성 분석)  
-  - `scikit-learn`, `TensorFlow/Keras` (머신러닝 & 딥러닝)  
-  - `matplotlib`, `seaborn` (데이터 시각화)  
+  - Selenium (웹 크롤링)  
+  - pandas, numpy (데이터 처리)  
+  - Hugging Face Transformers (감성 분석)  
+  - matplotlib, seaborn, plotly (데이터 시각화)  
+  - scikit-learn, TensorFlow/Keras (머신러닝 & 딥러닝)  
 
 ---
 
