@@ -1,0 +1,19 @@
+# ✅ Python 관련
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# ✅ 가상환경 (venv)
+venv/
+.venv/
+
+# ✅ 환경변수 파일 (.env)
+.env
+
+# ✅ 로그 파일
+logs/
+*.log
+
+# ✅ Git 덮어쓰기 방지
+!.gitignore

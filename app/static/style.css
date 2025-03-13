@@ -1,0 +1,82 @@
+/* 🔹 전체 배경 */
+body {
+    font-family: 'Arial', 'Helvetica', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    background: linear-gradient(135deg, #ffffff, #e0f7ff);
+    color: #333;
+    text-align: center;
+    padding: 20px;
+}
+
+/* 🔹 제목 스타일 */
+h1 {
+    color: #003366;
+    font-size: 32px;
+    margin-bottom: 20px;
+}
+
+/* 🔹 웹툰 테이블 스타일 */
+.webtoon-table {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+table {
+    width: 90%;
+    border-collapse: collapse;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* 🔹 테이블 헤더 */
+th {
+    background: #007bff;
+    color: white;
+    padding: 12px;
+    font-size: 18px;
+}
+
+/* 🔹 테이블 본문 */
+td {
+    padding: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    font-size: 14px;  /* 글자 크기 줄이기 */
+}
+
+/* 🔹 웹툰 제목 링크 */
+td a {
+    text-decoration: none;
+    color: #007bff;
+    font-weight: bold;
+}
+
+td a:hover {
+    color: #ff4500;
+}
+
+/* 🔹 홀수 행 배경 */
+tr:nth-child(odd) {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+/* 🔹 메인 페이지로 돌아가기 버튼 */
+.back-button {
+    display: inline-block;
+    background: linear-gradient(135deg, #007bff, #00c3ff);
+    color: white;
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.3s ease-in-out;
+    text-align: center;
+    box-shadow: 0px 4px 10px rgba(0, 123, 255, 0.3);
+}
+
+.back-button:hover {
+    background: linear-gradient(135deg, #00c3ff, #007bff);
+    transform: scale(1.05);
+}

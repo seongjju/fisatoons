@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>네이버 웹툰 목록</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>네이버 웹툰 목록</h1>
+
+    <!-- 📌 웹툰 요일별 테이블 -->
+    <div class="webtoon-table">
+        <table>
+            <thead>
+                <tr>
+                    {% for day, label in weekday_labels.items() %}
+                        <th>{{ label }}</th>  <!-- 요일 헤더 (월~일) -->
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in range(10) %}  <!-- 최대 10개 웹툰까지 표시 -->
+                <tr>
+                    {% for day in weekday_labels.keys() %}
+                    <td>
+                        {% if webtoon_by_weekday[day] | length > i %}
+                            <a href="/webtoon/{{ webtoon_by_weekday[day][i]['_id'] }}">
+                                {{ webtoon_by_weekday[day][i]['title'] }}
+                            </a>
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>웹툰 상세 정보</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="/static/Chart.js"></script>
+
+</head>
+<body>
+    <h1>{{ webtoon['title'] }}</h1>
+
+    <canvas id="ratingChart"></canvas>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+    let ctx = document.getElementById("ratingChart").getContext("2d");
+
+    let episodeNumbers = JSON.parse('{{ episode_numbers | safe }}');
+    let actualRatings = JSON.parse('{{ actual_ratings | safe }}');
+    let model1Predictions = JSON.parse('{{ model_1_predictions | safe }}');
+    let model2Predictions = JSON.parse('{{ model_2_predictions | safe }}');
+    let model3Predictions = JSON.parse('{{ model_3_predictions | safe }}');
+
+    let ratingChart = new Chart(ctx, {
+        type: "line",
+        data: {
+            labels: episodeNumbers,
+            datasets: [
+                {
+                    label: "실제 별점",
+                    borderColor: "#ff4757",  // 네온 레드
+                    backgroundColor: "rgba(255, 71, 87, 0.2)",
+                    data: actualRatings,
+                    fill: false,
+                    borderWidth: 2,
+                    pointRadius: 4,   // 🔹 데이터 포인트 크기 (점)
+                    pointBackgroundColor: "#ff4757"
+                },
+                {
+                    label: "모델 1 예측 별점",
+                    borderColor: "#1e90ff",  // 네온 블루
+                    backgroundColor: "rgba(30, 144, 255, 0.2)",
+                    data: model1Predictions,
+                    fill: false,
+                    borderWidth: 2,
+                    pointRadius: 4,
+                    pointBackgroundColor: "#1e90ff"
+                },
+                {
+                    label: "모델 2 예측 별점",
+                    borderColor: "#2ed573",  // 네온 그린
+                    backgroundColor: "rgba(46, 213, 115, 0.2)",
+                    data: model2Predictions,
+                    fill: false,
+                    borderWidth: 2,
+                    pointRadius: 4,
+                    pointBackgroundColor: "#2ed573"
+                },
+                {
+                    label: "모델 3 예측 별점",
+                    borderColor: "#ffa502",  // 네온 오렌지
+                    backgroundColor: "rgba(255, 165, 2, 0.2)",
+                    data: model3Predictions,
+                    fill: false,
+                    borderWidth: 2,
+                    pointRadius: 4,
+                    pointBackgroundColor: "#ffa502"
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    min: 3.0,  // ⭐ 최소 5.0
+                    max: 10.0, // ⭐ 최대 10.0
+                    ticks: {
+                        stepSize: 0.5,  // ⭐ 0.5 단위 눈금
+                        color: "#333"
+                    },
+                    grid: { color: "#bbb" }  // 눈금 색 변경
+                },
+                x: {
+                    grid: { color: "#ddd" }
+                }
+            }
+        }
+    });
+});
+    </script>
+    <a href="/" class="back-button">🔙 메인 페이지로 돌아가기</a>
+</body>
+</html>
