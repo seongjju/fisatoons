@@ -6,6 +6,20 @@
     <title>네이버 웹툰 목록</title>
     <link rel="stylesheet" href="/static/style.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        /* 버튼을 가로로 정렬 */
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px; /* 버튼 간격 */
+            margin-top: 20px;
+        }
+
+        .graph-container {
+            display: none; /* 처음에는 안 보이도록 설정 */
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
     <h1>네이버 웹툰 목록</h1>
@@ -39,51 +53,43 @@
         </table>
     </div>
 
-    <!-- ✅ 장르별 평균 별점 그래프 보기 버튼 -->
-    <button id="load-graph" class="back-button">📊 장르별 평균 별점 그래프 보기</button>
-
-    <!-- ✅ 그래프 표시 영역 -->
-    <div id="graph-container" style="margin-top: 20px;">
-        <iframe id="graph-frame" src="" style="width: 100%; height: 700px; border: none; display: none;"></iframe>
+    <!-- ✅ 버튼 가로 정렬 -->
+    <div class="button-container">
+        <button id="load-graph" class="back-button">📊 장르별 평균 별점</button>
+        <button id="load-overall-graph" class="back-button">📊 전체 웹툰 예측 비교</button>
+        <button id="load-webtoon-avg-bar-graph" class="back-button">📊 웹툰별 평균 별점</button>
     </div>
+
+    <!-- ✅ 그래프 표시 영역 (처음에는 숨김) -->
+    <div id="graph-container" class="graph-container"></div>
+    <div id="overall-graph-container" class="graph-container"></div>
+    <div id="webtoon-avg-bar-graph-container" class="graph-container"></div>
 
     <script>
         $(document).ready(function() {
+            function showGraph(graphContainer, url) {
+                // 모든 그래프 숨기기
+                $(".graph-container").hide();
+
+                // 선택한 그래프만 보이도록 설정
+                $(graphContainer).show();
+
+                // FastAPI 엔드포인트에서 HTML 받아와서 삽입
+                $.get(url, function(data) {
+                    $(graphContainer).html(data);
+                });
+            }
+
             $("#load-graph").click(function() {
-                $("#graph-frame").attr("src", "/genre-rating-graph").show();
+                showGraph("#graph-container", "/genre-rating-graph");
             });
-        });
-    </script>
 
-    <!-- ✅ 전체 웹툰 예측 비교 그래프 보기 버튼 -->
-<button id="load-overall-graph" class="back-button">📊 전체 웹툰 예측 비교 그래프 보기</button>
+            $("#load-overall-graph").click(function() {
+                showGraph("#overall-graph-container", "/overall-predictions-graph");
+            });
 
-<!-- ✅ 그래프 표시 영역 -->
-<div id="overall-graph-container" style="margin-top: 20px;">
-    <iframe id="overall-graph-frame" src="" style="width: 100%; height: 700px; border: none; display: none;"></iframe>
-</div>
-
-
-<script>
-    $(document).ready(function() {
-        $("#load-overall-graph").click(function() {
-            $("#overall-graph-frame").attr("src", "/overall-predictions-graph").show();
-        });
-    });
-</script>
-
-    <!-- ✅ 웹툰별 평균 별점 꺾은선 그래프 보기 버튼 -->
-    <button id="load-webtoon-avg-line-graph" class="back-button">📊 웹툰별 평균 별점 그래프 보기</button>
-
-    <!-- ✅ 그래프 표시 영역 -->
-    <div id="webtoon-avg-line-graph-container" style="margin-top: 20px;">
-        <iframe id="webtoon-avg-line-graph-frame" src="" style="width: 100%; height: 700px; border: none; display: none;"></iframe>
-    </div>
-
-    <script>
-        $(document).ready(function() {
-            $("#load-webtoon-avg-line-graph").click(function() {
-                $("#webtoon-avg-line-graph-frame").attr("src", "/webtoon-avg-line-graph").show();
+            $("#load-webtoon-avg-bar-graph").click(function() {
+                showGraph("#webtoon-avg-bar-graph-container", "/webtoon-avg-bar-graph");
             });
         });
     </script>

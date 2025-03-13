@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, HTMLResponse
 from pymongo import MongoClient
 
-from app.broken_line_graph import generate_webtoon_avg_line_graph
+from app.bar_line_graph import generate_webtoon_avg_bar_graph
 from app.model_MLDL import get_webtoon_prediction, get_sentiment_trend, get_residual_analysis  # 추가된 함수 불러오기
 
 from app.plot_overall_predictions import generate_overall_predictions_graph    # 📌 그래프 함수 불러오기
@@ -96,7 +96,6 @@ async def overall_predictions_graph():
     return generate_overall_predictions_graph()
 
 
-# ✅ 📌 웹툰별 평균 별점 그래프 라우트
-@app.get("/webtoon-avg-line-graph", response_class=HTMLResponse)
-async def webtoon_avg_line_graph():
-    return generate_webtoon_avg_line_graph()
+@app.get("/webtoon-avg-bar-graph", response_class=HTMLResponse)
+async def webtoon_avg_bar_graph():
+    return generate_webtoon_avg_bar_graph()
