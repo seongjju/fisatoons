@@ -6,3 +6,10 @@ requests
 textblob
 python-dotenv
 selenium
+pandas
+numpy
+matplotlib
+seaborn
+tabulate
+wordcloud
+plotly

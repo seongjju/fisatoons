@@ -17,3 +17,5 @@ logs/
 
 # ✅ Git 덮어쓰기 방지
 !.gitignore
+
+data
