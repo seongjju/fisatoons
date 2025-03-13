@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>네이버 웹툰 목록</title>
     <link rel="stylesheet" href="/static/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
     <h1>네이버 웹툰 목록</h1>
@@ -25,6 +26,7 @@
                     {% for day in weekday_labels.keys() %}
                     <td>
                         {% if webtoon_by_weekday[day] | length > i %}
+                            <!-- 웹툰 상세 페이지로 이동하는 링크 -->
                             <a href="/webtoon/{{ webtoon_by_weekday[day][i]['_id'] }}">
                                 {{ webtoon_by_weekday[day][i]['title'] }}
                             </a>
@@ -36,5 +38,21 @@
             </tbody>
         </table>
     </div>
+
+    <!-- ✅ 장르별 평균 별점 그래프 보기 버튼 -->
+    <button id="load-graph" class="back-button">📊 장르별 평균 별점 그래프 보기</button>
+
+    <!-- ✅ 그래프 표시 영역 -->
+    <div id="graph-container" style="margin-top: 20px;">
+        <iframe id="graph-frame" src="" style="width: 100%; height: 700px; border: none; display: none;"></iframe>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $("#load-graph").click(function() {
+                $("#graph-frame").attr("src", "/genre-rating-graph").show();
+            });
+        });
+    </script>
 </body>
 </html>
