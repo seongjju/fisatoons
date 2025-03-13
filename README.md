@@ -108,7 +108,6 @@ FISAToon 프로젝트는 **웹툰 댓글 데이터를 기반으로 감성 분석
 - `train_test_split`은 데이터를 무작위로 분할하므로, 특정 웹툰이 일부만 포함됨
 - 무작위 말고 **전체 데이터** 활용
 
----
 
 ### ❌ 문제: MinMaxScaler 적용 시 `fit_transform()`과 `transform()`의 순서 오류  
 **✅ 해결 방법:**  
